@@ -40,7 +40,7 @@ If you specify a "$config", switch the configuration file
 
 #### Example
 ```
-$configfilename = 'eng';
+$config = 'eng';
 ```
 navigation-default.php -> navigation-eng.php
 
@@ -60,7 +60,7 @@ If you specify a "$config", switch the configuration file
 
 #### Example
 ```
-$configfilename = 'eng';
+$config = 'eng';
 ```
 navigation-default.php -> navigation-eng.php
 
@@ -87,7 +87,7 @@ If you specify a "$config", switch the configuration file
 
 #### Example
 ```
-$configfilename = 'eng';
+$config = 'eng';
 ```
 navigation-default.php -> navigation-eng.php
 
@@ -118,7 +118,7 @@ If you specify a "$config", switch the configuration file
 
 #### Example
 ```
-$configfilename = 'eng';
+$config = 'eng';
 ```
 navigation-default.php -> navigation-eng.php
 
