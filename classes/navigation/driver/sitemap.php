@@ -1,8 +1,15 @@
 <?php
+/**
+ * FuelPHP Package for Navigation
+ *
+ * @version    0.5
+ */
 
 namespace Navigation;
 
-class Navigation_Driver_Sitemap extends \Navigation_Driver
+class Navigation_Driver_Sitemap
+extends
+	\Navigation_Driver
 {
 
 	/**
@@ -20,21 +27,22 @@ class Navigation_Driver_Sitemap extends \Navigation_Driver
 	const SITEMAP_XSD = 'http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd';
 
 	/**
-	 * Create Sitemap Xml
-	 *
-	 * @param		Striung		settings for the config name
-	 * @return	html
+	 * Init, config loading.
 	 */
-	public static function forge($config = 'default')
+	public static function _init()
 	{
-		static::initialize();
-		static::setPages($config);
-		static::setIterator();
-		foreach (static::$iterator as $key => $value)
-		{
-			$pages[$key] = $key;
-		}
-		$uris = \Arr::filter_keys($pages, static::$properties, true);
+		parent::initialize();
+	}
+
+	/**
+	 * Navigation Driver Sitemap forge
+	 *
+	 * @return string
+	 */
+	public static function forge()
+	{
+		$uris = array_keys(static::$pages);
+		$uris = array_replace($uris, array(0 => '/'));
 
 		// create document
 		$dom = new \DOMDocument('1.0', 'UTF-8');

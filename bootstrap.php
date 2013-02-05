@@ -4,7 +4,7 @@ Autoloader::add_core_namespace('Navigation');
 
 Autoloader::add_classes(array(
 	'Navigation\\Navigation'										=> __DIR__.'/classes/navigation.php',
-	'Navigation\\NavigationException'						=> __DIR__.'/classes/navigation.php',
+	'Navigation\\BadMethodCallException'				=> __DIR__.'/classes/navigation.php',
 
 	'Navigation\\Navigation_Driver'							=> __DIR__.'/classes/navigation/driver.php',
 	'Navigation\\Navigation_Driver_Breadcrumbs'	=> __DIR__.'/classes/navigation/driver/breadcrumbs.php',

@@ -18,14 +18,4 @@ return array(
 		'filterkey' => 'label',
 	),
 
-	'childnode' => 'pages',
-
-	'properties' => array(
-		'label',
-		'title',
-		'description',
-		'keywords',
-		'pages',
-	),
-
 );

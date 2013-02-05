@@ -1,8 +1,15 @@
 <?php
+/**
+ * FuelPHP Package for Navigation
+ *
+ * @version    0.5
+ */
 
 namespace Navigation;
 
-class Navigation_Driver_Breadcrumbs extends \Navigation_Driver
+class Navigation_Driver_Breadcrumbs
+extends
+	\Navigation_Driver
 {
 
 	/**
@@ -23,49 +30,38 @@ class Navigation_Driver_Breadcrumbs extends \Navigation_Driver
 	);
 
 	/**
-	 * Initialize, config loading.
+	 * Init, config loading.
 	 */
-	protected static function initialize()
+	public static function _init()
 	{
 		parent::initialize();
-		self::$template  = \Config::get('settings.breadcrumbs.template');
 		self::$filterkey = \Config::get('settings.breadcrumbs.filterkey');
+		self::$template  = \Config::get('settings.breadcrumbs.template');
 	}
 
 	/**
-	 * Create Breadcrumb Html
+	 * Navigation Driver Breadcrumbs forge
 	 *
-	 * @param		Striung		settings for the config name
-	 * @return	html
+	 * @return string
 	 */
-	public static function forge($config = 'default')
+	public static function forge()
 	{
-		static::initialize();
-		static::setUris();
-		static::setPages($config);
+		$filterpages = \Arr::filter_keys(static::$pages, static::$uris);
 
-		$flatten = \Arr::flatten(static::$pages, self::GLUE);
-		$filter  = \Arr::filter_suffixed($flatten, self::GLUE.static::$filterkey);
-		foreach ($filter as $key => $value)
-		{
-			$key = preg_replace('/^.*'.static::$childnode.self::GLUE.'/i', null, $key);
-			$uris[$key] = $value;
-		}
-		$uris = \Arr::filter_keys($uris, static::$uris);
-
-		$output[] = \Arr::get(static::$template, 'wrapper_start');
-		$max   = count($uris) - 1;
+		$output[] = \Arr::get(self::$template, 'wrapper_start');
+		$max   = count($filterpages) - 1;
 		$count = 0;
-		foreach ($uris as $uri => $content)
+		foreach ($filterpages as $uri => $contents)
 		{
 			$is_last = ($count++ === $max);
 
 			$output[] = $is_last
 				?
-				\Arr::get(static::$template, 'item_start_active')
+				\Arr::get(self::$template, 'item_start_active')
 				:
-				\Arr::get(static::$template, 'item_start');
+				\Arr::get(self::$template, 'item_start');
 
+			$content = \Arr::get($contents, self::$filterkey);
 			$output[] = $is_last
 				?
 				$content
@@ -76,13 +72,14 @@ class Navigation_Driver_Breadcrumbs extends \Navigation_Driver
 				?
 				null
 				:
-				\Arr::get(static::$template, 'divider');
+				\Arr::get(self::$template, 'divider');
 
-			$output[] = \Arr::get(static::$template, 'item_end');
+			$output[] = \Arr::get(self::$template, 'item_end');
 		}
-		$output[]= \Arr::get(static::$template, 'wrapper_end');
+		$output[]= \Arr::get(self::$template, 'wrapper_end');
 
 		return implode(null, \Arr::filter_recursive($output)).PHP_EOL;
 	}
+
 
 }

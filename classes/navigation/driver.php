@@ -1,23 +1,14 @@
 <?php
+/**
+ * FuelPHP Package for Navigation
+ *
+ * @version    0.5
+ */
 
 namespace Navigation;
 
-use \Traversable;
-use \RecursiveIteratorIterator;
-use \RecursiveArrayIterator;
-
 abstract class Navigation_Driver
 {
-
-	/**
-	 * Glue
-	 */
-	const GLUE = ':';
-
-	/**
-	 * Uri list
-	 */
-	protected static $uris = false;
 
 	/**
 	 * Page list
@@ -25,88 +16,79 @@ abstract class Navigation_Driver
 	protected static $pages = false;
 
 	/**
-	 * Iterator　Page list
+	 * Uri list
 	 */
-	protected static $iterator = false;
+	protected static $uris = false;
 
 	/**
-	 * Child Node
-	 */
-	protected static $childnode = 'pages';
-
-	/**
-	 * Property list
-	 */
-	protected static $properties = array(
-		'label',
-		'title',
-		'description',
-		'keywords',
-		'pages',
-	);
-
-	/**
-	 * Initialize, config loading.
+	 * initialize, config loading.
 	 */
 	protected static function initialize()
 	{
-		\Config::load('navigation-settings', 'settings', false, true);
-		self::$properties = \Config::get('settings.properties');
-		self::$childnode  = \Config::get('settings.childnode');
+		self::$pages = self::$pages ? self::$pages : \Config::get('pages');
+		self::$uris = self::$uris ? self::$uris : self::getUris();
 	}
 
 	/**
-	 * Set Uri List
+	 * Find Property
+	 *
+	 * @param		string	$property
+	 * @param		string	$uri			default null
+	 * @return	string
 	 */
-	protected static function setUris()
+	protected static function find($property, $uri = null)
+	{
+		self::initialize();
+		$uri = is_null($uri) ? \Uri::string() : $uri;
+		$page = \Arr::get(self::$pages, $uri);
+		return $page ? \Arr::get($page, $property) : null;
+	}
+
+	/**
+	 * Append Properties
+	 *
+	 * @param	array		$properties
+	 * @param	string	$uri
+	 */
+	protected static function append(array $properties, $uri = null)
+	{
+		self::initialize();
+		$uri = is_null($uri) ? \Uri::string() : $uri;
+		self::$pages = \Arr::merge(self::$pages, array($uri => $properties));
+	}
+
+	/**
+	 * Find First Key
+	 *
+	 * @return	string
+	 */
+	protected static function findFirstKey()
+	{
+		reset(self::$pages);
+		return key(self::$pages);
+	}
+
+	/**
+	 * Get \Uri::string() base List
+	 */
+	private static function getUris()
 	{
 		$segments = \Uri::segments();
-		$uris[]   = '/';
-		$uri      = null;
+		$list[]   = array();
 
 		foreach ($segments as $segment)
 		{
-			if (preg_match('/^([0-9])+$/', $segment) > 0 or $segment === 'index')
-			{
-				continue;
-			}
-
-			$uri     = $uri.'/'.$segment;
-			$uris[] .= $uri;
+			$list[] = \Arr::merge(end($list), array($segment));
 		}
+		$list = \Arr::filter_recursive($list);
 
-		self::$uris = $uris;
-	}
-
-	/**
-	 * Set Pages
-	 *
-	 * @param		string	$config	extra config
-	 * @return	void
-	 */
-	protected static function setPages($config)
-	{
-		\Config::load(sprintf('navigation-%s', $config), 'pages', false, true);
-		$pages = \Config::get('pages');
-		if ($pages && (!is_array($pages) && !$pages instanceof \Traversable))
+		foreach ($list as $uri)
 		{
-			throw new \NavigationException('Invalid argument: $pages must be an array, an instance of Traversable, or null');
+			$uris[] = implode('/', $uri);
 		}
-		self::$pages = $pages;
-	}
+		\Arr::insert($uris, self::findFirstKey(), 0);
 
-	/**
-	 * Iterator Pages
-	 *
-	 * @param		string	$config	extra config
-	 * @return	void
-	 */
-	protected static function setIterator()
-	{
-		self::$iterator = new \RecursiveIteratorIterator(
-			new \RecursiveArrayIterator(self::$pages),
-			\RecursiveIteratorIterator::SELF_FIRST
-		);
+		return $uris;
 	}
 
 }

@@ -1,62 +1,95 @@
 <?php
+/**
+ * FuelPHP Package for Navigation
+ *
+ * @version    0.5
+ */
 
 namespace Navigation;
 
-class NavigationException extends \FuelException {}
+class BadMethodCallException extends \FuelException {}
 
-class Navigation extends \Navigation_Driver
+class Navigation
+extends
+	\Navigation_Driver
 {
 
 	/**
-	 * Get Key
-	 *
-	 * @return  string
+	 * @var  Navigation	default instance
 	 */
-	public static function get($uri, $property, $config = 'default')
-	{
-		static::initialize();
-		static::setPages($config);
+	protected static $INSTANCE = null;
 
-		$flatten = \Arr::flatten(static::$pages, self::GLUE);
-		$filter  = \Arr::filter_suffixed($flatten, self::GLUE.$property);
-		foreach ($filter as $key => $value)
+	/**
+	 * @var  Array  contains references if multiple were loaded
+	 */
+	protected static $INSTANCES = array();
+
+	/**
+	 * Init, settings config loading.
+	 */
+	public static function _init()
+	{
+		\Config::load('navigation-settings', 'settings', false, true);
+		static::$INSTANCE = new static;
+	}
+
+	/**
+	 * Navigation forge
+	 *
+	 * @param		string		$config
+	 * @return  instance
+	 */
+	public static function forge($config = 'default')
+	{
+		\Config::load(sprintf('navigation-%s', $config), 'pages', false, true);
+		return static::$INSTANCE;
+	}
+
+	/**
+	 * Call rerouting for usage.
+	 *
+	 * @param		string		$method	method name called
+	 * @param		array			$args		supplied arguments
+	 * @return	instance
+	 */
+	public function __call($method, $args = array())
+	{
+		return static::__callStatic($method, $args);
+	}
+
+	/**
+	 * Call rerouting for static usage.
+	 *
+	 * @param		string		$method	method name called
+	 * @param		array			$args		supplied arguments
+	 * @return	instance
+	 */
+	public static function __callStatic($method, $args = array())
+	{
+		$args = array_pad($args, 2, null);
+		if (\Config::get('pages') === null)
 		{
-			$key = preg_replace('/^.*'.static::$childnode.self::GLUE.'/i', null, $key);
-			$uris[$key] = $value;
+			static::forge($args[0]);
 		}
-		$uris = \Arr::filter_keys($uris, array($uri));
 
-		return current($uris);
-	}
+		if (method_exists(static::$INSTANCE, $method))
+		{
+			return call_user_func_array(array(static::$INSTANCE, $method), $args);
+		}
 
-	/**
-	 * Breadcrumb
-	 *
-	 * @return  string
-	 */
-	public static function breadcrumbs($config = 'default')
-	{
-		return \Navigation_Driver_Breadcrumbs::forge($config);
-	}
+		if (array_key_exists($method, static::$INSTANCES))
+		{
+			return call_user_func_array(array(static::$INSTANCES[$method], 'forge'), $args);
+		}
 
-	/**
-	 * Links
-	 *
-	 * @return  string
-	 */
-	public static function links($config = 'default')
-	{
-		return \Navigation_Driver_Links::forge($config);
-	}
+		$class = '\Navigation_Driver_'.ucfirst($method);
+		if (class_exists($class))
+		{
+			static::$INSTANCES[$method] = new $class;
+			return call_user_func_array(array(static::$INSTANCES[$method], 'forge'), $args);
+		}
 
-	/**
-	 * Sitemap
-	 *
-	 * @return  string
-	 */
-	public static function sitemap($config = 'default')
-	{
-		return \Navigation_Driver_Sitemap::forge($config);
+		throw new \BadMethodCallException('Invalid method: '.$class.'::forge');
 	}
 
 }
