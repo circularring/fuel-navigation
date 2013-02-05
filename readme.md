@@ -36,6 +36,19 @@ Navigation::breadcrumbs($config = 'default');
 // result <ul class="breadcrumb"><li><a title="Home" href="/">Home</a><span class="divider">/</span></li><li class="active">page1</li></ul>
 ```
 
+or
+
+```
+Navigation::forge($config = 'default');
+Navigation::breadcrumbs();
+```
+
+or
+
+```
+Navigation::forge($config = 'default')->breadcrumbs();
+```
+
 If you specify a "$config", switch the configuration file
 
 #### Example
@@ -54,6 +67,19 @@ Navigation::links($config = 'default');
 // <link rel="start" href="/" title="Home">
 // <link rel="next" href="/page3" title="page3">
 // <link rel="prev" href="/page1" title="page1">
+```
+
+or
+
+```
+Navigation::forge($config = 'default');
+Navigation::links();
+```
+
+or
+
+```
+Navigation::forge($config = 'default')->links();
 ```
 
 If you specify a "$config", switch the configuration file
@@ -83,6 +109,19 @@ Navigation::sitemap($config = 'default');
 // </urlset>
 ```
 
+or
+
+```
+Navigation::forge($config = 'default');
+Navigation::sitemap();
+```
+
+or
+
+```
+Navigation::forge($config = 'default')->sitemap();
+```
+
 If you specify a "$config", switch the configuration file
 
 #### Example
@@ -92,22 +131,34 @@ $config = 'eng';
 navigation-default.php -> navigation-eng.php
 
 
-### get properties
+### find property
 
 Outputs a property
 ```
-Navigation::get($uri, $property, $config = 'default');
-// result home etc..
+Navigation::find($property, $uri = null);
+// result title etc..
 ```
 
-"$uri" is Root-relative URL.
+or
+
+```
+Navigation::forge($config = 'default');
+Navigation::find($property, $uri = null);
+```
+
+or
+
+```
+Navigation::forge($config = 'default')->find($property, $uri = null);
+```
+
+"$uri" is Uri::string() base URL.
+if $uri is null then set Uri::string()
 
 #### Example
 ```
-$uri = '/page1/page2';
+$uri = 'page1/page2';
 ```
-
-"$property" is "properties" of navigation-settings.php
 
 #### Example
 ```
@@ -122,4 +173,45 @@ $config = 'eng';
 ```
 navigation-default.php -> navigation-eng.php
 
-###### my code is ugly (笑
+
+### append properties
+
+Outputs a property
+```
+Navigation::append($properties, $uri = null);
+```
+
+or
+
+```
+Navigation::forge($config = 'default');
+Navigation::append($properties, $uri = null);
+```
+
+or
+
+```
+Navigation::forge($config = 'default')->append($properties, $uri = null);
+```
+
+"$uri" is Uri::string() base URL.
+if $uri is null then set Uri::string()
+
+#### Example
+```
+$uri = 'page1/page2';
+```
+
+#### Example
+```
+$properties = array('description' => 'Thid is description');
+```
+
+If you specify a "$config", switch the configuration file
+
+#### Example
+```
+$config = 'eng';
+```
+navigation-default.php -> navigation-eng.php
+
