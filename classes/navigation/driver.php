@@ -75,6 +75,7 @@ abstract class Navigation_Driver
 	{
 		$segments = \Uri::segments();
 		$list[]   = array();
+		$uris     = array();
 
 		foreach ($segments as $segment)
 		{
