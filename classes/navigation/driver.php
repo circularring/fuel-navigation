@@ -2,7 +2,7 @@
 /**
  * FuelPHP Package for Navigation
  *
- * @version    0.5
+ * @version    0.5.1
  */
 
 namespace Navigation;

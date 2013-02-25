@@ -2,7 +2,7 @@
 /**
  * FuelPHP Package for Navigation
  *
- * @version    0.5
+ * @version    0.5.1
  */
 
 namespace Navigation;
@@ -51,10 +51,21 @@ extends
 		}
 
 		// next
-		$nextpages = \Arr::filter_keys(static::$pages, static::$uris, true);
-		if ($nextpages)
+		end(static::$uris);
+		$currenturi = current(static::$uris);
+		$pageskeys = array_keys(static::$pages);
+		while(list(, $val) = each($pageskeys))
 		{
-			$relation['next'] = array(key($nextpages) => \Arr::get(static::$pages, key($nextpages).'.'.self::$filterkey));
+			if ($val === $currenturi)
+			{
+				list(, $nextkey) = each($pageskeys);
+				break;
+			}
+		}
+
+		if ($nextkey)
+		{
+			$relation['next'] = array($nextkey => \Arr::get(static::$pages, $nextkey.'.'.self::$filterkey));
 		}
 
 		foreach ($relation as $key => $value)
