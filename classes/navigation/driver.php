@@ -2,7 +2,7 @@
 /**
  * FuelPHP Package for Navigation
  *
- * @version    0.5.1
+ * @version    0.5.2
  */
 
 namespace Navigation;
@@ -39,7 +39,7 @@ abstract class Navigation_Driver
 	protected static function find($property, $uri = null)
 	{
 		self::initialize();
-		$uri = is_null($uri) ? \Uri::string() : $uri;
+		$uri = is_null($uri) ? \Uri::string()?:self::findFirstKey() : $uri;
 		$page = \Arr::get(self::$pages, $uri);
 		return $page ? \Arr::get($page, $property) : null;
 	}

@@ -2,7 +2,7 @@
 /**
  * FuelPHP Package for Navigation
  *
- * @version    0.5.1
+ * @version    0.5.2
  */
 
 namespace Navigation;
@@ -47,6 +47,10 @@ extends
 	public static function forge()
 	{
 		$filterpages = \Arr::filter_keys(static::$pages, static::$uris);
+		$firstkey    = static::findFirstKey();
+
+		$filterpages = \Arr::merge(array('/' => \Arr::get($filterpages, $firstkey)), $filterpages);
+		\Arr::delete($filterpages, $firstkey);
 
 		$output[] = \Arr::get(self::$template, 'wrapper_start');
 		$max   = count($filterpages) - 1;
