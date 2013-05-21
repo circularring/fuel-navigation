@@ -54,6 +54,7 @@ extends
 		end(static::$uris);
 		$currenturi = current(static::$uris);
 		$pageskeys = array_keys(static::$pages);
+		$nextkey = null;
 		while(list(, $val) = each($pageskeys))
 		{
 			if ($val === $currenturi)
